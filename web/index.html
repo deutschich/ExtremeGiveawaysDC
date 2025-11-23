@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ExtremeGiveawaysDC - Der ultimative Discord Giveaway Bot mit erweiterten Funktionen, Statistiken und Automatisierung für deinen Server.">
+    <meta name="keywords" content="Discord Bot, Giveaway, Gewinnspiel, Discord, Bot, ExtremeGiveawaysDC, Open Source, GitHub">
+    <meta name="author" content="ExtremeGiveawaysDC">
+    <title>ExtremeGiveawaysDC - Der ultimative Discord Giveaway Bot</title>
+    
+    <!-- Open Graph Tags für Social Media -->
+    <meta property="og:title" content="ExtremeGiveawaysDC - Discord Giveaway Bot">
+    <meta property="og:description" content="Der ultimative Discord Giveaway Bot mit erweiterten Funktionen, Statistiken und Automatisierung.">
+    <meta property="og:type" content="website">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
+    
+    <style>
+        :root {
+            --primary: #5865F2;
+            --primary-dark: #4752C4;
+            --secondary: #57F287;
+            --dark: #2C2F33;
+            --darker: #23272A;
+            --light: #FFFFFF;
+            --gray: #99AAB5;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: var(--dark);
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        nav a:hover {
+            color: var(--primary);
+        }
+        
+        .cta-button {
+            background-color: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .cta-button:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .mobile-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--light);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 5rem 0;
+            text-align: center;
+            background: linear-gradient(135deg, var(--dark) 0%, var(--darker) 100%);
+        }
+        
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+            color: var(--gray);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        
+        .secondary-button {
+            background-color: transparent;
+            color: var(--light);
+            border: 2px solid var(--primary);
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .secondary-button:hover {
+            background-color: var(--primary);
+        }
+        
+        /* Features Section */
+        .section {
+            padding: 5rem 0;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background-color: var(--dark);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-title {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .feature-list {
+            list-style: none;
+        }
+        
+        .feature-list li {
+            margin-bottom: 0.5rem;
+            position: relative;
+            padding-left: 1.5rem;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--secondary);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            text-align: center;
+            padding: 4rem 0;
+            border-radius: 10px;
+            margin: 2rem 0;
+        }
+        
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-section p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            padding: 3rem 0 1rem;
+            margin-top: 3rem;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--light);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-wrap: wrap;
+            }
+            
+            nav {
+                width: 100%;
+                order: 3;
+                margin-top: 1rem;
+                display: none;
+            }
+            
+            nav.active {
+                display: block;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .mobile-menu {
+                display: block;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">🎁</span>
+                    <span>ExtremeGiveawaysDC</span>
+                </div>
+                
+                <button class="mobile-menu" id="mobileMenu">☰</button>
+                
+                <nav id="mainNav">
+                    <ul>
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#commands">Commands</a></li>
+                        <li><a href="#stats">Statistiken</a></li>
+                        <li><a href="#github">GitHub</a></li>
+                    </ul>
+                </nav>
+                
+                <a href="#add-bot" class="cta-button">Bot hinzufügen</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>ExtremeGiveawaysDC</h1>
+            <p>Der ultimative Discord Giveaway Bot mit erweiterten Funktionen, Statistiken und Automatisierung für deinen Server.</p>
+            
+            <div class="hero-buttons">
+                <a href="#add-bot" class="cta-button">Bot zu Discord hinzufügen</a>
+                <a href="#github" class="secondary-button">GitHub Repository</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section" id="features">
+        <div class="container">
+            <h2 class="section-title">Funktionen</h2>
+            
+            <div class="features-grid">
+                <!-- Kernfunktionen -->
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Kernfunktionen</h3>
+                    <ul class="feature-list">
+                        <li>Giveaway-Erstellung mit Slash-Commands</li>
+                        <li>Wöchentliche Giveaways (automatisch)</li>
+                        <li>Mehrere Gewinner pro Giveaway</li>
+                        <li>Zeitgesteuerte Beendigung mit Countdown</li>
+                        <li>Automatische Gewinnerauswahl</li>
+                    </ul>
+                </div>
+                
+                <!-- Teilnahmeverwaltung -->
+                <div class="feature-card">
+                    <div class="feature-icon">🎫</div>
+                    <h3 class="feature-title">Teilnahmeverwaltung</h3>
+                    <ul class="feature-list">
+                        <li>Button-basierte Teilnahme</li>
+                        <li>Einsehbare Teilnehmerliste</li>
+                        <li>Rollenbasierte Einschränkungen</li>
+                        <li>Teilnahmevoraussetzungen</li>
+                        <li>Min. Teilnahmen, Siege, Niederlagen</li>
+                    </ul>
+                </div>
+                
+                <!-- Verwaltungsfunktionen -->
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h3 class="feature-title">Verwaltungsfunktionen</h3>
+                    <ul class="feature-list">
+                        <li>/giveaway - Erstellung</li>
+                        <li>/giveaway_weekly - Wöchentlich</li>
+                        <li>/giveaway_cancel - Abbruch</li>
+                        <li>/giveaway_list - Übersicht</li>
+                        <li>Administrator-Berechtigungen</li>
+                    </ul>
+                </div>
+                
+                <!-- Admin Features -->
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Admin Features</h3>
+                    <ul class="feature-list">
+                        <li>Audit-Log-Kanal</li>
+                        <li>Teilnehmer-Export als CSV</li>
+                        <li>Giveaway-Customization</li>
+                        <li>Berechtigungsprüfung</li>
+                        <li>Server-spezifische Einstellungen</li>
+                    </ul>
+                </div>
+                
+                <!-- Statistik & Analytics -->
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Statistik & Analytics</h3>
+                    <ul class="feature-list">
+                        <li>/stats - Server-Statistiken</li>
+                        <li>/leaderboard - Gewinner-Rangliste</li>
+                        <li>/my_stats - Persönliche Statistiken</li>
+                        <li>Win-Rate Berechnung</li>
+                        <li>Teilnahmen & Gewinne pro Benutzer</li>
+                    </ul>
+                </div>
+                
+                <!-- Sicherheit & Einschränkungen -->
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Sicherheit & Einschränkungen</h3>
+                    <ul class="feature-list">
+                        <li>Rollenbasierte Zugangskontrolle</li>
+                        <li>Minimale Voraussetzungen</li>
+                        <li>Teilnahmebedingungen</li>
+                        <li>Server-spezifische Einstellungen</li>
+                        <li>Berechtigungsprüfung</li>
+                    </ul>
+                </div>
+                
+                <!-- Automatisierte Funktionen -->
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3 class="feature-title">Automatisierte Funktionen</h3>
+                    <ul class="feature-list">
+                        <li>Automatische Giveaway-Beendigung</li>
+                        <li>Wöchentliche Neuerstellung</li>
+                        <li>Automatische Datenpersistenz</li>
+                        <li>Hintergrund-Tasks</li>
+                        <li>JSON-basierte Datenspeicherung</li>
+                    </ul>
+                </div>
+                
+                <!-- Benutzererfahrung -->
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Benutzererfahrung</h3>
+                    <ul class="feature-list">
+                        <li>Interaktive Discord-Buttons</li>
+                        <li>Ansprechende Embed-Nachrichten</li>
+                        <li>Echtzeit-Teilnehmerzähler</li>
+                        <li>Countdown-Anzeige</li>
+                        <li>DM-Benachrichtigungen für Gewinner</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="section" id="add-bot">
+        <div class="container">
+            <div class="cta-section">
+                <h2>Füge ExtremeGiveawaysDC zu deinem Server hinzu</h2>
+                <p>Verbessere deinen Discord-Server mit dem fortschrittlichsten Giveaway-Bot. Einfach zu bedienen, vollständig anpassbar und Open Source.</p>
+                <a href="#" class="cta-button" style="background-color: var(--light); color: var(--primary);">Jetzt hinzufügen</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- GitHub Section -->
+    <section class="section" id="github">
+        <div class="container">
+            <h2 class="section-title">Open Source auf GitHub</h2>
+            <div style="text-align: center; max-width: 700px; margin: 0 auto;">
+                <p style="margin-bottom: 2rem;">ExtremeGiveawaysDC ist ein Open-Source-Projekt. Du kannst den Code einsehen, verbessern oder zu deinem eigenen Bot beitragen.</p>
+                <a href="#" class="cta-button">GitHub Repository besuchen</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>ExtremeGiveawaysDC</h3>
+                    <p>Der ultimative Discord Giveaway Bot mit erweiterten Funktionen für deinen Server.</p>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Links</h3>
+                    <ul class="footer-links">
+                        <li><a href="#features">Features</a></li>
+                        <li><a href="#commands">Commands</a></li>
+                        <li><a href="#stats">Statistiken</a></li>
+                        <li><a href="#github">GitHub</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-column">
+                    <h3>Support</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Dokumentation</a></li>
+                        <li><a href="#">Discord Server</a></li>
+                        <li><a href="#">Kontakt</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 ExtremeGiveawaysDC. Alle Rechte vorbehalten.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile Menu Toggle
+        document.getElementById('mobileMenu').addEventListener('click', function() {
+            document.getElementById('mainNav').classList.toggle('active');
+        });
+        
+        // Smooth Scrolling for Anchor Links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    document.getElementById('mainNav').classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
