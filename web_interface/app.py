@@ -170,27 +170,64 @@ def login():
 
 @app.route('/callback')
 def callback():
-    """OAuth2 callback - simplified for now"""
-    # For now, we'll use a simplified approach
-    # In production, you would exchange the code for tokens
+    """Exchange the Discord OAuth2 code for a user token and fetch profile."""
     code = request.args.get('code')
     
     if not code:
         flash("Authentication failed: No code received", "error")
         return redirect(url_for('index'))
     
-    # For demo purposes, we'll create a mock user
-    # In production, make POST request to Discord to exchange code for tokens
-    mock_user = {
-        'id': '123456789',
-        'username': 'DemoUser',
-        'discriminator': '0001',
-        'avatar': None
+    # 1. Prepare data to exchange code for token
+    data = {
+        'client_id': os.environ.get('DISCORD_CLIENT_ID'),
+        'client_secret': os.environ.get('DISCORD_CLIENT_SECRET'),
+        'grant_type': 'authorization_code',
+        'code': code,
+        'redirect_uri': os.environ.get('DISCORD_REDIRECT_URI'),
+    }
+    headers = {
+        'Content-Type': 'application/x-www-form-urlencoded'
     }
     
-    session['discord_user'] = mock_user
-    flash("Successfully logged in! (Demo mode)", "success")
-    return redirect(url_for('dashboard'))
+    # 2. POST request to Discord's token endpoint
+    try:
+        response = requests.post('https://discord.com/api/oauth2/token', data=data, headers=headers)
+        token_data = response.json()
+        
+        if response.status_code != 200:
+            logger.error(f"Token exchange failed: {token_data}")
+            flash("Authentication failed at token exchange.", "error")
+            return redirect(url_for('index'))
+        
+        access_token = token_data['access_token']
+        
+        # 3. Use the access token to fetch user data
+        user_headers = {
+            'Authorization': f'Bearer {access_token}'
+        }
+        user_response = requests.get('https://discord.com/api/users/@me', headers=user_headers)
+        user_data = user_response.json()
+        
+        if user_response.status_code != 200:
+            logger.error(f"User fetch failed: {user_data}")
+            flash("Failed to fetch user profile.", "error")
+            return redirect(url_for('index'))
+        
+        # 4. Store REAL user data in session
+        session['discord_user'] = {
+            'id': user_data['id'],
+            'username': user_data['username'],
+            'discriminator': user_data.get('discriminator', '0'),
+            'avatar': f"https://cdn.discordapp.com/avatars/{user_data['id']}/{user_data['avatar']}.png" if user_data.get('avatar') else None
+        }
+        
+        flash("Successfully logged in with Discord!", "success")
+        return redirect(url_for('dashboard'))
+        
+    except Exception as e:
+        logger.error(f"OAuth callback error: {e}")
+        flash("An unexpected error occurred during authentication.", "error")
+        return redirect(url_for('index'))
 
 @app.route('/logout')
 def logout():
