@@ -36,28 +36,28 @@ done
 
 # Pull latest images
 echo "📦 Pulling latest images from GHCR..."
-docker pull ghcr.io/deutschich/extremegiveawaysdc-bot:latest
-docker pull ghcr.io/deutschich/extremegiveawaysdc-web:latest
+docker pull ghcr.io/deutschich/extremegiveawaysdc-bot:main
+docker pull ghcr.io/deutschich/extremegiveawaysdc-web:main
 
 # Stop and remove existing containers
 echo "🛑 Stopping existing containers..."
-docker-compose down || true
+docker compose down || true
 
 # Start new containers
 echo "🚀 Starting new containers..."
-docker-compose up -d
+docker compose up -d
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to be ready..."
 sleep 10
 
 # Check if services are running
-if docker-compose ps | grep -q "Up"; then
+if docker compose ps | grep -q "Up"; then
     echo "✅ Deployment successful!"
     echo "🌐 Web Interface: http://localhost:8080"
     echo "🤖 Bot is running"
 else
     echo "❌ Deployment failed!"
-    docker-compose logs
+    docker compose logs
     exit 1
 fi

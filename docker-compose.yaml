@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   discord-bot:
-    image: ghcr.io/extremegiveawaysdc/extremegiveawaysdc-bot:latest
+    image: ghcr.io/deutschich/extremegiveawaysdc-bot:main
     container_name: extremegiveaways-bot
     restart: unless-stopped
     environment:
@@ -21,7 +21,7 @@ services:
         max-file: "3"
 
   web-interface:
-    image: ghcr.io/extremegiveawaysdc/extremegiveawaysdc-web:latest
+    image: ghcr.io/deutschich/extremegiveawaysdc-web:main
     container_name: extremegiveaways-web
     restart: unless-stopped
     ports:

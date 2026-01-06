@@ -72,7 +72,7 @@ class ServerCache(db.Model):
     cached_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 # Helper functions
-def load_giveaways() -> Dict:
+def load_giveaways() -> dict:
     """Load giveaways from JSON file"""
     try:
         if os.path.exists(GIVEAWAY_FILE):
@@ -82,7 +82,7 @@ def load_giveaways() -> Dict:
         logger.error(f"Error loading giveaways: {e}")
     return {}
 
-def load_server_settings() -> Dict:
+def load_server_settings() -> dict:
     """Load server settings from JSON file"""
     try:
         if os.path.exists(SERVER_SETTINGS_FILE):
@@ -92,7 +92,7 @@ def load_server_settings() -> Dict:
         logger.error(f"Error loading server settings: {e}")
     return {}
 
-def get_user_guilds(access_token: str) -> List[Dict]:
+def get_user_guilds(access_token: str) -> List[dict]:
     """Get user's guilds from Discord API"""
     try:
         headers = {
@@ -106,7 +106,7 @@ def get_user_guilds(access_token: str) -> List[Dict]:
         logger.error(f"Error fetching user guilds: {e}")
         return []
 
-def get_bot_guilds() -> List[Dict]:
+def get_bot_guilds() -> List[dict]:
     """Get guilds where bot is present"""
     try:
         # This should call your bot's API or read from cache
@@ -128,7 +128,7 @@ def get_bot_guilds() -> List[Dict]:
         logger.error(f"Error getting bot guilds: {e}")
         return []
 
-def get_managed_guilds(user_guilds: List[Dict], bot_guilds: List[Dict]) -> List[Dict]:
+def get_managed_guilds(user_guilds: List[dict], bot_guilds: List[dict]) -> List[dict]:
     """Get guilds where user has admin permissions and bot is present"""
     managed_guilds = []
     
