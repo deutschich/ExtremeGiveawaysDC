@@ -92,7 +92,7 @@ def load_server_settings() -> dict:
         logger.error(f"Error loading server settings: {e}")
     return {}
 
-def get_user_guilds(access_token: str) -> List[dict]:
+def get_user_guilds(access_token: str) -> list[dict]:
     """Get user's guilds from Discord API"""
     try:
         headers = {
@@ -106,7 +106,7 @@ def get_user_guilds(access_token: str) -> List[dict]:
         logger.error(f"Error fetching user guilds: {e}")
         return []
 
-def get_bot_guilds() -> List[dict]:
+def get_bot_guilds() -> list[dict]:
     """Get guilds where bot is present"""
     try:
         # This should call your bot's API or read from cache
@@ -128,7 +128,7 @@ def get_bot_guilds() -> List[dict]:
         logger.error(f"Error getting bot guilds: {e}")
         return []
 
-def get_managed_guilds(user_guilds: List[dict], bot_guilds: List[dict]) -> List[dict]:
+def get_managed_guilds(user_guilds: list[dict], bot_guilds: list[dict]) -> list[dict]:
     """Get guilds where user has admin permissions and bot is present"""
     managed_guilds = []
     
