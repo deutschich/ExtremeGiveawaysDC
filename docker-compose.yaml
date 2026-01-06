@@ -2,6 +2,9 @@ version: '3.8'
 
 services:
   discord-bot:
+    build: 
+      context: .
+      dockerfile: Dockerfile.bot
     image: ghcr.io/deutschich/extremegiveawaysdc-bot:main
     container_name: extremegiveaways-bot
     restart: unless-stopped
@@ -10,8 +13,9 @@ services:
       - DATA_PATH=/data
       - LOG_LEVEL=INFO
       - TZ=Europe/Berlin
+      - PYTHONUNBUFFERED=1
     volumes:
-      - ./data:/data
+      - giveaway_data:/data
     networks:
       - giveaway-network
     logging:
@@ -21,6 +25,9 @@ services:
         max-file: "3"
 
   web-interface:
+    build:
+      context: ./web_interface
+      dockerfile: Dockerfile
     image: ghcr.io/deutschich/extremegiveawaysdc-web:main
     container_name: extremegiveaways-web
     restart: unless-stopped
@@ -39,7 +46,7 @@ services:
       - DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
       
       # Database
-      - DATABASE_URL=sqlite:///data/web_interface.db
+      - DATABASE_URL=sqlite:////data/web_interface.db
       
       # Paths
       - DATA_PATH=/data
@@ -49,17 +56,16 @@ services:
       - ENDED_GIVEAWAYS_FILE=/data/ended_giveaways.json
       
       # Security
-      - SESSION_COOKIE_SECURE=true
+      - SESSION_COOKIE_SECURE=false
       - SESSION_COOKIE_HTTPONLY=true
       - SESSION_COOKIE_SAMESITE=Lax
       
       # Server
       - HOST=0.0.0.0
       - PORT=8080
-      - WORKERS=4
-      - THREADS=2
+      - WORKERS=2
     volumes:
-      - ./data:/data
+      - giveaway_data:/data
     depends_on:
       - discord-bot
     networks:
@@ -69,6 +75,9 @@ services:
       options:
         max-size: "10m"
         max-file: "3"
+
+volumes:
+  giveaway_data:
 
 networks:
   giveaway-network:
