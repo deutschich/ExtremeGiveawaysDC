@@ -1,0 +1,597 @@
+{% extends "base.html" %}
+
+{% block title %}{{ server.name }} - ExtremeGiveawaysDC{% endblock %}
+
+{% block content %}
+<!-- Server Header -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            {% if server.icon %}
+            <img src="https://cdn.discordapp.com/icons/{{ server.id }}/{{ server.icon }}.png" 
+                 alt="Server Icon" 
+                 class="rounded-circle me-3" 
+                 width="64" 
+                 height="64">
+            {% else %}
+            <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                 style="width: 64px; height: 64px;">
+                <i class="fas fa-server fa-2x"></i>
+            </div>
+            {% endif %}
+            
+            <div>
+                <h2 class="mb-1">{{ server.name }}</h2>
+                <div class="d-flex gap-3">
+                    <span class="text-muted">
+                        <i class="fas fa-gift"></i> {{ active_count }} Active Giveaways
+                    </span>
+                    <span class="text-muted">
+                        <i class="fas fa-users"></i> {{ total_participants }} Total Participants
+                    </span>
+                </div>
+            </div>
+            
+            <div class="ms-auto">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createGiveawayModal">
+                    <i class="fas fa-plus"></i> New Giveaway
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Giveaways List -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-gift"></i> Active Giveaways</h5>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-secondary" onclick="refreshGiveaways()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                        Filter
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#" onclick="filterGiveaways('all')">All</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterGiveaways('active')">Active</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterGiveaways('ending')">Ending Soon</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="filterGiveaways('ended')">Ended</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <div id="giveawaysList">
+                    <!-- Giveaways will be loaded here via JavaScript -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-3">Loading giveaways...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Ended Giveaways -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recently Ended Giveaways</h5>
+            </div>
+            <div class="card-body">
+                <div id="endedGiveaways">
+                    <p class="text-muted text-center py-3">No recently ended giveaways</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <!-- Quick Actions -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createGiveawayModal">
+                        <i class="fas fa-plus"></i> Create Giveaway
+                    </button>
+                    <button class="btn btn-info" onclick="loadChannels()">
+                        <i class="fas fa-list"></i> View Channels
+                    </button>
+                    <button class="btn btn-warning" onclick="loadSettings()">
+                        <i class="fas fa-cog"></i> Server Settings
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Server Stats -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Server Statistics</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <h6>Giveaway Status</h6>
+                    <div class="progress mb-2">
+                        <div class="progress-bar bg-success" style="width: 70%">Active: 70%</div>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-danger" style="width: 30%">Ended: 30%</div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h6>Participation Rate</h6>
+                    <div class="d-flex justify-content-between">
+                        <span>Avg. Participants:</span>
+                        <span class="badge bg-info">45</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Total Winners:</span>
+                        <span class="badge bg-success">128</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Server Info -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-info-circle"></i> Server Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Server ID:</small>
+                    <p class="mb-0"><code>{{ server.id }}</code></p>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Your Permissions:</small>
+                    <p class="mb-0">
+                        <span class="badge bg-success">
+                            <i class="fas fa-crown"></i> Administrator
+                        </span>
+                    </p>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Audit Channel:</small>
+                    <p class="mb-0">
+                        {% if settings.audit_channel %}
+                        <span class="badge bg-primary">Configured</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Not Set</span>
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Giveaway Modal -->
+<div class="modal fade" id="createGiveawayModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-gift"></i> Create New Giveaway</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="createGiveawayForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Prize *</label>
+                            <input type="text" class="form-control" name="prize" required 
+                                   placeholder="What are you giving away?">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Number of Winners *</label>
+                            <input type="number" class="form-control" name="winners" required 
+                                   min="1" max="100" value="1">
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Duration *</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" name="duration_amount" 
+                                       min="1" value="1" required>
+                                <select class="form-select" name="duration_unit">
+                                    <option value="m">Minutes</option>
+                                    <option value="h" selected>Hours</option>
+                                    <option value="d">Days</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Channel</label>
+                            <select class="form-control" name="channel_id" id="channelSelect">
+                                <option value="">Loading channels...</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-control" name="description" rows="3" 
+                                  placeholder="Optional giveaway description..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Allowed Roles (Optional)</label>
+                        <select class="form-control" name="allowed_roles" id="rolesSelect" multiple>
+                            <option value="">Loading roles...</option>
+                        </select>
+                        <small class="text-muted">Hold Ctrl to select multiple roles</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Winner Role (Optional)</label>
+                        <select class="form-control" name="winner_role" id="winnerRoleSelect">
+                            <option value="">Select a role for winners...</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">DM Message to Winners (Optional)</label>
+                        <textarea class="form-control" name="dm_message" rows="2" 
+                                  placeholder="Message to send winners via DM..."></textarea>
+                    </div>
+                    
+                    <input type="hidden" name="guild_id" value="{{ server.id }}">
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" onclick="createGiveaway()">
+                    <i class="fas fa-plus"></i> Create Giveaway
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Giveaway Modal -->
+<div class="modal fade" id="editGiveawayModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-edit"></i> Edit Giveaway</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="editGiveawayBody">
+                <!-- Content will be loaded via JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const guildId = '{{ server.id }}';
+    
+    $(document).ready(function() {
+        loadGiveaways();
+        loadChannels();
+        loadRoles();
+    });
+    
+    function loadGiveaways() {
+        $.ajax({
+            url: `/api/giveaways/${guildId}`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    displayGiveaways(response.giveaways);
+                } else {
+                    $('#giveawaysList').html(`
+                        <div class="alert alert-danger">
+                            Failed to load giveaways: ${response.error}
+                        </div>
+                    `);
+                }
+            },
+            error: function() {
+                $('#giveawaysList').html(`
+                    <div class="alert alert-danger">
+                        Failed to load giveaways. Please try again.
+                    </div>
+                `);
+            }
+        });
+    }
+    
+    function displayGiveaways(giveaways) {
+        if (giveaways.length === 0) {
+            $('#giveawaysList').html(`
+                <div class="text-center py-5">
+                    <i class="fas fa-gift fa-4x text-muted mb-3"></i>
+                    <h5>No Active Giveaways</h5>
+                    <p class="text-muted">Create your first giveaway to get started!</p>
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#createGiveawayModal">
+                        <i class="fas fa-plus"></i> Create Giveaway
+                    </button>
+                </div>
+            `);
+            return;
+        }
+        
+        let html = '<div class="row">';
+        
+        giveaways.forEach(giveaway => {
+            const endTime = new Date(giveaway.end_time);
+            const now = new Date();
+            const timeLeft = Math.max(0, (endTime - now) / 1000);
+            const hoursLeft = Math.floor(timeLeft / 3600);
+            const minutesLeft = Math.floor((timeLeft % 3600) / 60);
+            
+            let statusClass = 'giveaway-card';
+            let statusDot = 'status-active';
+            let statusText = 'Active';
+            
+            if (timeLeft === 0) {
+                statusClass += ' ended';
+                statusDot = 'status-ended';
+                statusText = 'Ended';
+            } else if (timeLeft < 3600) { // Less than 1 hour
+                statusClass += ' ending';
+                statusDot = 'status-ending';
+                statusText = 'Ending Soon';
+            }
+            
+            html += `
+            <div class="col-md-6 mb-3">
+                <div class="card ${statusClass}">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <span class="status-dot ${statusDot}"></span>
+                                <strong>${statusText}</strong>
+                            </div>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" 
+                                        type="button" 
+                                        data-bs-toggle="dropdown">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="editGiveaway('${giveaway.id}')">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="viewParticipants('${giveaway.id}')">
+                                            <i class="fas fa-users"></i> Participants
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" 
+                                           onclick="endGiveawayNow('${giveaway.id}')">
+                                            <i class="fas fa-stop"></i> End Now
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-danger" href="#" 
+                                           onclick="cancelGiveaway('${giveaway.id}')">
+                                            <i class="fas fa-times"></i> Cancel
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <h5 class="card-title">${giveaway.prize}</h5>
+                        <div class="row mb-2">
+                            <div class="col-6">
+                                <small class="text-muted">Winners:</small>
+                                <p class="mb-0"><strong>${giveaway.winners_count}</strong></p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Participants:</small>
+                                <p class="mb-0">
+                                    <span class="badge participant-badge">${giveaway.participants}</span>
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <small class="text-muted">Ends:</small>
+                            <p class="mb-0">
+                                ${timeLeft > 0 ? 
+                                    `${hoursLeft}h ${minutesLeft}m` : 
+                                    'Ended'}
+                            </p>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button class="btn btn-sm btn-outline-primary" 
+                                    onclick="viewGiveawayDetails('${giveaway.id}')">
+                                <i class="fas fa-info-circle"></i> View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `;
+        });
+        
+        html += '</div>';
+        $('#giveawaysList').html(html);
+    }
+    
+    function loadChannels() {
+        $.ajax({
+            url: `/api/server/${guildId}/channels`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    let options = '<option value="">Select a channel...</option>';
+                    response.channels.forEach(channel => {
+                        options += `<option value="${channel.id}">#${channel.name}</option>`;
+                    });
+                    $('#channelSelect').html(options);
+                }
+            }
+        });
+    }
+    
+    function loadRoles() {
+        $.ajax({
+            url: `/api/server/${guildId}/roles`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    let options = '<option value="">Select roles...</option>';
+                    let winnerOptions = '<option value="">No role</option>';
+                    
+                    response.roles.forEach(role => {
+                        options += `<option value="${role.id}">@${role.name}</option>`;
+                        winnerOptions += `<option value="${role.id}">@${role.name}</option>`;
+                    });
+                    
+                    $('#rolesSelect').html(options);
+                    $('#winnerRoleSelect').html(winnerOptions);
+                }
+            }
+        });
+    }
+    
+    function createGiveaway() {
+        const formData = {
+            guild_id: guildId,
+            prize: $('input[name="prize"]').val(),
+            winners: $('input[name="winners"]').val(),
+            duration: $('input[name="duration_amount"]').val() + $('select[name="duration_unit"]').val(),
+            channel_id: $('#channelSelect').val(),
+            description: $('textarea[name="description"]').val(),
+            allowed_roles: $('#rolesSelect').val(),
+            winner_role: $('#winnerRoleSelect').val(),
+            dm_message: $('textarea[name="dm_message"]').val()
+        };
+        
+        $.ajax({
+            url: '/api/giveaway/create',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function(response) {
+                if (response.success) {
+                    alert('Giveaway created successfully!');
+                    $('#createGiveawayModal').modal('hide');
+                    loadGiveaways();
+                    // Reset form
+                    $('#createGiveawayForm')[0].reset();
+                } else {
+                    alert('Error: ' + response.error);
+                }
+            },
+            error: function() {
+                alert('Failed to create giveaway. Please try again.');
+            }
+        });
+    }
+    
+    function editGiveaway(giveawayId) {
+        // Load giveaway data and populate edit modal
+        // Implementation depends on your API
+        alert('Edit functionality for giveaway: ' + giveawayId);
+    }
+    
+    function endGiveawayNow(giveawayId) {
+        if (confirm('Are you sure you want to end this giveaway now?')) {
+            $.ajax({
+                url: `/api/giveaway/${giveawayId}/end`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ guild_id: guildId }),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Giveaway ended successfully!');
+                        loadGiveaways();
+                    } else {
+                        alert('Error: ' + response.error);
+                    }
+                }
+            });
+        }
+    }
+    
+    function cancelGiveaway(giveawayId) {
+        if (confirm('Are you sure you want to cancel this giveaway?')) {
+            $.ajax({
+                url: `/api/giveaway/${giveawayId}/cancel`,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ guild_id: guildId }),
+                success: function(response) {
+                    if (response.success) {
+                        alert('Giveaway cancelled successfully!');
+                        loadGiveaways();
+                    } else {
+                        alert('Error: ' + response.error);
+                    }
+                }
+            });
+        }
+    }
+    
+    function viewParticipants(giveawayId) {
+        $.ajax({
+            url: `/api/giveaway/${giveawayId}/participants`,
+            method: 'GET',
+            data: { guild_id: guildId },
+            success: function(response) {
+                if (response.success) {
+                    let participantsList = '';
+                    if (response.participants.length > 0) {
+                        participantsList = '<ul class="list-group">';
+                        response.participants.forEach(participant => {
+                            participantsList += `<li class="list-group-item">${participant}</li>`;
+                        });
+                        participantsList += '</ul>';
+                    } else {
+                        participantsList = '<p class="text-muted">No participants</p>';
+                    }
+                    
+                    $('#editGiveawayBody').html(`
+                        <h6>Participants (${response.count})</h6>
+                        ${participantsList}
+                        <div class="mt-3">
+                            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    `);
+                    $('#editGiveawayModal').modal('show');
+                }
+            }
+        });
+    }
+    
+    function viewGiveawayDetails(giveawayId) {
+        // Load and display giveaway details
+        alert('Details for giveaway: ' + giveawayId);
+    }
+    
+    function refreshGiveaways() {
+        loadGiveaways();
+    }
+    
+    function filterGiveaways(filter) {
+        // Implement filtering logic
+        console.log('Filtering by:', filter);
+    }
+    
+    function loadSettings() {
+        alert('Loading server settings...');
+        // Implement settings loading
+    }
+</script>
+{% endblock %}

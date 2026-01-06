@@ -20,11 +20,20 @@ intents.message_content = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Files for data storage
-GIVEAWAY_FILE = "giveaways.json"
-SERVER_SETTINGS_FILE = "server_settings.json"
-STATISTICS_FILE = "statistics.json"
-ENDED_GIVEAWAYS_FILE = "ended_giveaways.json"  # Neue Datei für beendete Giveaways
+
+DATA_PATH = os.getenv('DATA_PATH', '/data')
+Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
+
+# Files for data storage with absolute paths
+GIVEAWAY_FILE = os.path.join(DATA_PATH, "giveaways.json")
+SERVER_SETTINGS_FILE = os.path.join(DATA_PATH, "server_settings.json")
+STATISTICS_FILE = os.path.join(DATA_PATH, "statistics.json")
+ENDED_GIVEAWAYS_FILE = os.path.join(DATA_PATH, "ended_giveaways.json")
+
+# Log file paths
+logger.info(f"Data directory: {DATA_PATH}")
+logger.info(f"Giveaway file: {GIVEAWAY_FILE}")
+logger.info(f"Settings file: {SERVER_SETTINGS_FILE}")
 
 # Dictionaries for data storage
 active_giveaways = {}
@@ -664,37 +673,36 @@ def load_data():
                     else:
                         asyncio.create_task(end_giveaway(giveaway_id, 0))
 
-            print(f"✅ {len(active_giveaways)} giveaways loaded")
+            logger.info(f"✅ {len(active_giveaways)} giveaways loaded")
         except Exception as e:
-            print(f"❌ Error loading giveaways: {e}")
+            logger.error(f"❌ Error loading giveaways: {e}")
 
     # Load server settings
     if os.path.exists(SERVER_SETTINGS_FILE):
         try:
             with open(SERVER_SETTINGS_FILE, 'r', encoding='utf-8') as f:
                 server_settings = json.load(f)
-            print("✅ Server settings loaded")
+            logger.info("✅ Server settings loaded")
         except Exception as e:
-            print(f"❌ Error loading server settings: {e}")
+            logger.error(f"❌ Error loading server settings: {e}")
 
     # Load user statistics
     if os.path.exists(STATISTICS_FILE):
         try:
             with open(STATISTICS_FILE, 'r', encoding='utf-8') as f:
                 user_statistics = json.load(f)
-            print("✅ User statistics loaded")
+            logger.info("✅ User statistics loaded")
         except Exception as e:
-            print(f"❌ Error loading user statistics: {e}")
+            logger.error(f"❌ Error loading user statistics: {e}")
 
     # Load ended giveaways
     if os.path.exists(ENDED_GIVEAWAYS_FILE):
         try:
             with open(ENDED_GIVEAWAYS_FILE, 'r', encoding='utf-8') as f:
                 ended_giveaways = json.load(f)
-            print(f"✅ {sum(len(g) for g in ended_giveaways.values())} ended giveaways loaded")
+            logger.info(f"✅ {sum(len(g) for g in ended_giveaways.values())} ended giveaways loaded")
         except Exception as e:
-            print(f"❌ Error loading ended giveaways: {e}")
-
+            logger.error(f"❌ Error loading ended giveaways: {e}")
 
 def save_giveaways():
     """Saves giveaways to JSON file"""

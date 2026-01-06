@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - ExtremeGiveawaysDC{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- User Profile Card -->
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <img src="{{ user.avatar_url or 'https://cdn.discordapp.com/embed/avatars/0.png' }}" 
+                     alt="Avatar" 
+                     class="rounded-circle mb-3" 
+                     width="100" 
+                     height="100">
+                
+                <h4>{{ user.username }}#{{ user.discriminator }}</h4>
+                <p class="text-muted">Discord User</p>
+                
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('logout') }}" class="btn btn-outline-danger">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Quick Stats</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Managed Servers:</span>
+                    <span class="badge bg-primary">{{ total_guilds }}</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Total Giveaways:</span>
+                    <span class="badge bg-success" id="totalGiveaways">0</span>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Active Giveaways:</span>
+                    <span class="badge bg-warning" id="activeGiveaways">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- Managed Servers -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-server"></i> Managed Servers</h5>
+                <span class="badge bg-primary">{{ managed_guilds|length }}</span>
+            </div>
+            
+            <div class="card-body">
+                {% if managed_guilds %}
+                <div class="row">
+                    {% for guild in managed_guilds %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card server-card" onclick="window.location.href='{{ url_for('server_dashboard', guild_id=guild.id) }}'">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    {% if guild.icon %}
+                                    <img src="https://cdn.discordapp.com/icons/{{ guild.id }}/{{ guild.icon }}.png" 
+                                         alt="Server Icon" 
+                                         class="rounded-circle me-3" 
+                                         width="50" 
+                                         height="50">
+                                    {% else %}
+                                    <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center me-3" 
+                                         style="width: 50px; height: 50px;">
+                                        <i class="fas fa-server fa-lg"></i>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <div>
+                                        <h6 class="mb-0">{{ guild.name }}</h6>
+                                        <small class="text-muted">
+                                            <i class="fas fa-crown text-warning"></i>
+                                            Administrator Access
+                                        </small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mt-3">
+                                    <a href="{{ url_for('server_dashboard', guild_id=guild.id) }}" 
+                                       class="btn btn-sm btn-primary w-100">
+                                        <i class="fas fa-cog"></i> Manage Giveaways
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-server fa-4x text-muted mb-3"></i>
+                    <h5>No Managed Servers Found</h5>
+                    <p class="text-muted">
+                        You need to have the bot installed and administrator permissions in a server to manage giveaways.
+                    </p>
+                    <a href="https://discord.com/oauth2/authorize?client_id=YOUR_CLIENT_ID&scope=bot&permissions=8" 
+                       target="_blank" 
+                       class="btn btn-discord">
+                        <i class="fab fa-discord"></i> Invite Bot to Server
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Recent Activity -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history"></i> Recent Activity</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    <div class="list-group-item bg-transparent border-secondary">
+                        <div class="d-flex w-100 justify-content-between">
+                            <small>No recent activity to display</small>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $(document).ready(function() {
+        // Load server statistics
+        loadServerStats();
+        
+        function loadServerStats() {
+            // This would make API calls to get actual statistics
+            // For now, we'll use placeholder values
+            $('#totalGiveaways').text('{{ total_guilds * 3 }}');
+            $('#activeGiveaways').text('{{ total_guilds * 2 }}');
+        }
+    });
+</script>
+{% endblock %}

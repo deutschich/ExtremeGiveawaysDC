@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Home - ExtremeGiveawaysDC{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 text-center">
+        <div class="card p-5">
+            <h1 class="display-4 mb-4">
+                <i class="fas fa-gift text-primary"></i>
+                ExtremeGiveawaysDC
+            </h1>
+            
+            <p class="lead mb-4">
+                Manage your Discord giveaways from a beautiful web interface.
+                Create, edit, and monitor giveaways across all your servers with ease.
+            </p>
+            
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-plus-circle fa-3x text-success mb-3"></i>
+                            <h5>Create Giveaways</h5>
+                            <p>Easily create new giveaways with our intuitive interface.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-edit fa-3x text-warning mb-3"></i>
+                            <h5>Manage Live</h5>
+                            <p>Edit active giveaways, change prizes, or end them early.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-chart-bar fa-3x text-info mb-3"></i>
+                            <h5>Track Stats</h5>
+                            <p>Monitor participation and winner statistics.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% if not session.get('discord_user') %}
+            <div class="mt-4">
+                <a href="{{ url_for('login') }}" class="btn btn-lg btn-discord">
+                    <i class="fab fa-discord me-2"></i>Login with Discord
+                </a>
+                <p class="text-muted mt-2">
+                    You need administrator permissions in servers where the bot is present.
+                </p>
+            </div>
+            {% else %}
+            <div class="mt-4">
+                <a href="{{ url_for('dashboard') }}" class="btn btn-lg btn-primary">
+                    <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

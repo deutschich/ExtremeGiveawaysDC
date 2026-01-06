@@ -1,0 +1,10 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-Discord
+python-dotenv
+requests
+aiohttp
+discord.py
+gunicorn
+psycopg2-binary
