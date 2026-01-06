@@ -30,14 +30,14 @@ done
 
 # Build and start containers
 echo "📦 Building and starting containers..."
-docker-compose up --build -d
+docker compose up
 
 # Wait for services to be ready
 echo "⏳ Waiting for services to be ready..."
 sleep 10
 
 # Check if services are running
-if docker-compose ps | grep -q "Up"; then
+if docker compose ps | grep -q "Up"; then
     echo "✅ Deployment successful!"
     echo "🌐 Web Interface: http://localhost:8080"
     echo "🤖 Bot is running"
@@ -48,6 +48,6 @@ if docker-compose ps | grep -q "Up"; then
     echo "3. Configure your Discord OAuth app with redirect URI: http://localhost:8080/callback"
 else
     echo "❌ Deployment failed!"
-    docker-compose logs
+    docker compose logs
     exit 1
 fi

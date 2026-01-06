@@ -10,6 +10,7 @@ import csv
 import io
 import shortuuid
 from typing import Optional, List, Union
+from pathlib import Path
 
 # Bot with necessary intents
 intents = discord.Intents.default()
