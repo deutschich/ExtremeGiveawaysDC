@@ -274,26 +274,29 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    if 'discord_user' not in session or 'access_token' not in session:
+    """User dashboard"""
+    if 'discord_user' not in session:
         flash("Please login first", "warning")
         return redirect(url_for('login'))
     
     user = session['discord_user']
-    access_token = session['access_token']  # Den Token im Callback speichern!
     
-    managed_guilds = get_managed_guilds_for_user(access_token)
+    # 1. LADE oder ERSTELLE die managed_guilds-Liste
+    # Diese Funktion 'get_user_guilds' musst du noch implementieren (siehe Option 2).
+    # Für jetzt: eine leere Liste als Platzhalter.
+    managed_guilds = []  # Hier später echte Daten einfügen
+    
+    # 2. Setze total_guilds auf die Länge der Liste
     total_guilds = len(managed_guilds)
     
-    # Lade tatsächliche Giveaway-Statistiken aus deinen JSON-Dateien
-    from your_data_module import load_giveaways  # Importiere deine Funktion
-    all_giveaways = load_giveaways()
-    total_giveaways = sum(len(g) for g in all_giveaways.values())
+    # 3. Weitere Platzhalter für Statistiken
+    total_giveaways = 0  # Diese Logik müsste aus deinen JSON-Dateien kommen
     
-    return render_template('dashboard.html',
+    return render_template('dashboard.html', 
                          user=user,
                          managed_guilds=managed_guilds,
                          total_guilds=total_guilds,
-                         total_giveaways=total_giveaways)
+                         total_giveaways=total_giveaways)  # Neue Variable hinzugefügt
 
 @app.route('/server/<guild_id>')
 def server_dashboard(guild_id: str):
