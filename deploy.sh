@@ -39,13 +39,13 @@ sleep 10
 # Check if services are running
 if docker compose ps | grep -q "Up"; then
     echo "✅ Deployment successful!"
-    echo "🌐 Web Interface: http://localhost:8080"
+    echo "🌐 Web Interface: http://localhost:5000"
     echo "🤖 Bot is running"
     echo ""
     echo "📋 Next steps:"
-    echo "1. Go to http://localhost:8080"
+    echo "1. Go to http://localhost:5000"
     echo "2. Login with Discord"
-    echo "3. Configure your Discord OAuth app with redirect URI: http://localhost:8080/callback"
+    echo "3. Configure your Discord OAuth app with redirect URI: http://localhost:5000/callback"
 else
     echo "❌ Deployment failed!"
     docker compose logs
