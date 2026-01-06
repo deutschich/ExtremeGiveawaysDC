@@ -33,6 +33,41 @@ DATABASE_FILE = os.environ.get('DATABASE_URL', 'sqlite:////data/web_interface.db
 # Ensure data directory exists
 Path(DATA_PATH).mkdir(parents=True, exist_ok=True)
 
+
+def get_managed_guilds_for_user(access_token):
+    """Fetch guilds where the user has admin permissions AND the bot is present."""
+    try:
+        # 1. Get guilds where the USER is admin
+        user_guilds_response = requests.get(
+            'https://discord.com/api/users/@me/guilds',
+            headers={'Authorization': f'Bearer {access_token}'}
+        )
+        user_guilds = user_guilds_response.json() if user_guilds_response.status_code == 200 else []
+        
+        # Filter for guilds where user has Administrator permission (0x8)
+        user_managed_guild_ids = [
+            g['id'] for g in user_guilds if (int(g.get('permissions', 0)) & 0x8) == 0x8
+        ]
+        
+        # 2. Get guilds where the BOT is a member (requires bot token)
+        bot_guilds_response = requests.get(
+            'https://discord.com/api/users/@me/guilds',
+            headers={'Authorization': f'Bot {os.environ.get("DISCORD_BOT_TOKEN")}'}
+        )
+        bot_guilds = bot_guilds_response.json() if bot_guilds_response.status_code == 200 else []
+        bot_guild_ids = [g['id'] for g in bot_guilds]
+        
+        # 3. Find intersection: Guilds user manages AND bot is in
+        managed_and_with_bot_ids = set(user_managed_guild_ids) & set(bot_guild_ids)
+        
+        # Return full guild objects for the intersection
+        return [g for g in user_guilds if g['id'] in managed_and_with_bot_ids]
+        
+    except Exception as e:
+        logger.error(f"Error fetching managed guilds: {e}")
+        return []
+
+
 # Initialize database
 def init_db():
     """Initialize the SQLite database"""
@@ -239,36 +274,25 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    """User dashboard"""
-    if 'discord_user' not in session:
+    if 'discord_user' not in session or 'access_token' not in session:
         flash("Please login first", "warning")
         return redirect(url_for('login'))
     
     user = session['discord_user']
+    access_token = session['access_token']  # Den Token im Callback speichern!
     
-    # Load giveaways to show statistics
-    giveaways = load_giveaways()
-    total_giveaways = sum(len(g) for g in giveaways.values())
+    managed_guilds = get_managed_guilds_for_user(access_token)
+    total_guilds = len(managed_guilds)
     
-    # Mock managed servers for demo
-    managed_guilds = [
-        {
-            'id': '123456789',
-            'name': 'Demo Server 1',
-            'icon': None,
-            'permissions': '2147483647'
-        },
-        {
-            'id': '987654321',
-            'name': 'Demo Server 2',
-            'icon': None,
-            'permissions': '2147483647'
-        }
-    ]
+    # Lade tatsächliche Giveaway-Statistiken aus deinen JSON-Dateien
+    from your_data_module import load_giveaways  # Importiere deine Funktion
+    all_giveaways = load_giveaways()
+    total_giveaways = sum(len(g) for g in all_giveaways.values())
     
-    return render_template('dashboard.html', 
+    return render_template('dashboard.html',
                          user=user,
                          managed_guilds=managed_guilds,
+                         total_guilds=total_guilds,
                          total_giveaways=total_giveaways)
 
 @app.route('/server/<guild_id>')
