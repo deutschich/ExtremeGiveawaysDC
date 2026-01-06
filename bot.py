@@ -11,6 +11,13 @@ import io
 import shortuuid
 from typing import Optional, List, Union
 from pathlib import Path
+import logging
+
+# 1. Konfiguration (einmalig am Anfang des Skripts)
+logging.basicConfig(level=logging.INFO)
+
+# 2. Logger erstellen
+logger = logging.getLogger(__name__)
 
 # Bot with necessary intents
 intents = discord.Intents.default()
