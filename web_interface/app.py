@@ -287,7 +287,6 @@ def dashboard():
     total_guilds = len(managed_guilds)
     
     # Lade tatsächliche Giveaway-Statistiken aus deinen JSON-Dateien
-    from your_data_module import load_giveaways  # Importiere deine Funktion
     all_giveaways = load_giveaways()
     total_giveaways = sum(len(g) for g in all_giveaways.values())
     
