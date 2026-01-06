@@ -249,14 +249,16 @@ def callback():
             flash("Failed to fetch user profile.", "error")
             return redirect(url_for('index'))
         
-        # 4. Store REAL user data in session
+        # 4. Store REAL user data AND the access token in session
         session['discord_user'] = {
             'id': user_data['id'],
             'username': user_data['username'],
             'discriminator': user_data.get('discriminator', '0'),
             'avatar': f"https://cdn.discordapp.com/avatars/{user_data['id']}/{user_data['avatar']}.png" if user_data.get('avatar') else None
         }
-        
+        # DIESE ZEILE HINZUFÜGEN: Das Token für spätere API-Aufrufe speichern
+        session['access_token'] = access_token
+
         flash("Successfully logged in with Discord!", "success")
         return redirect(url_for('dashboard'))
         
@@ -274,29 +276,26 @@ def logout():
 
 @app.route('/dashboard')
 def dashboard():
-    """User dashboard"""
-    if 'discord_user' not in session:
+    if 'discord_user' not in session or 'access_token' not in session:
         flash("Please login first", "warning")
         return redirect(url_for('login'))
     
     user = session['discord_user']
+    access_token = session['access_token']  # Den Token im Callback speichern!
     
-    # 1. LADE oder ERSTELLE die managed_guilds-Liste
-    # Diese Funktion 'get_user_guilds' musst du noch implementieren (siehe Option 2).
-    # Für jetzt: eine leere Liste als Platzhalter.
-    managed_guilds = []  # Hier später echte Daten einfügen
-    
-    # 2. Setze total_guilds auf die Länge der Liste
+    managed_guilds = get_managed_guilds_for_user(access_token)
     total_guilds = len(managed_guilds)
     
-    # 3. Weitere Platzhalter für Statistiken
-    total_giveaways = 0  # Diese Logik müsste aus deinen JSON-Dateien kommen
+    # Lade tatsächliche Giveaway-Statistiken aus deinen JSON-Dateien
+    from your_data_module import load_giveaways  # Importiere deine Funktion
+    all_giveaways = load_giveaways()
+    total_giveaways = sum(len(g) for g in all_giveaways.values())
     
-    return render_template('dashboard.html', 
+    return render_template('dashboard.html',
                          user=user,
                          managed_guilds=managed_guilds,
                          total_guilds=total_guilds,
-                         total_giveaways=total_giveaways)  # Neue Variable hinzugefügt
+                         total_giveaways=total_giveaways)
 
 @app.route('/server/<guild_id>')
 def server_dashboard(guild_id: str):
